@@ -1,0 +1,305 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath, amssymb, amsthm, hyperref}
+\usepackage{geometry}
+\geometry{margin=1in}
+\theoremstyle{definition}
+\newtheoremstyle{nopunct}%
+  {}{}% Space above/below
+  {}% Body font
+  {}% Indent
+  {\bfseries}% Head font
+  {}% ← NO punctuation
+  { }% Space after head
+  {}% Head spec
+\theoremstyle{nopunct}
+\newtheorem*{s}{Solution}
+
+\begin{document}
+
+\href{https://github.com/luca-miniati/ds4400/hw1/hw1.ipynb}{Link to code}
+
+\begin{s}\textbf{1}
+    \begin{enumerate} 
+        % 1
+        \item $E[X] = \frac{1}{50}(3 \cdot 25 + 10 \cdot 15 + 5 \cdot 10) = \frac{11}{2}$
+
+        % 2
+        \item
+            $E[X^2] = \frac{1}{50}(3^2 \cdot 25 + 10^2 \cdot 15 + 5^2 \cdot 10) = \frac{79}{2}$ \bigskip\\
+            $(E[X])^2 = \frac{121}{4}$ \bigskip\\
+            $\text{Var}(X) = \frac{79}{2} - \frac{121}{4} = \frac{37}{4}$
+
+        % 3
+        \item $E[X] = \frac{1}{47}(3 \cdot 23 + 10 \cdot 15 + 5 \cdot 9) = \frac{264}{47}$
+
+        % 4
+        \item $E[X(X - 1)] = E[X^2 - X] = E[X^2] - E[X] = \text{Var}(X) + (E[X])^2 - E[X] = 2 + 10^2 - 10 = 92$
+    \end{enumerate} 
+\end{s}
+
+\vspace{10pt}
+
+\begin{s}\textbf{2} \bigskip\\
+    Let $F$ be the event that an email has "free
+    money", and let $S$ be the event that an email
+    is spam.
+    \begin{enumerate} 
+        % 1
+        \item 
+            $P(F) = P(F | S) P(S) + P(F | \neg S) P(\neg S)$
+            \bigskip\\
+            $P(F) = \frac{1}{10} \cdot \frac{8}{10} +
+            \frac{1}{100} \cdot \frac{2}{10}$ 
+            \bigskip\\
+            $P(F) = \frac{41}{500}$
+
+        % 2
+        \item
+            $P(S | F) = \frac{P(F | S) P(S)}
+            {P(F | S) P(S) + P(F | \neg S) P(\neg S)}$
+            \bigskip\\
+            $P(S | F) = \frac{\frac{1}{10} \cdot \frac{8}{10}}
+            {\frac{1}{10} \cdot \frac{8}{10} + \frac{1}{100} \cdot \frac{2}{10}}$
+            \bigskip\\
+            $P(S | F) = \frac{40}{41}$
+
+        % 3
+        \item
+            $P(\neg S |\neg  F) = \frac{P(\neg F | \neg S) P(\neg S)}
+            {P(\neg F | \neg S) P(\neg S) + P(\neg F | S) P(S)}$
+            \bigskip\\
+            $P(\neg S | \neg F) = \frac{\frac{2}{10} \cdot \frac{99}{100}}
+            {\frac{2}{10} \cdot \frac{99}{100} + \frac{8}{10} \cdot \frac{9}{10}}$
+            \bigskip\\
+            $P(\neg S | \neg F) = \frac{11}{51}$
+    \end{enumerate}
+\end{s}
+
+\vspace{10pt}
+
+\begin{s}\textbf{3}
+    \begin{enumerate} 
+        % 1
+        \item Row-reduce $D_1$ and $D_2$: \bigskip\\
+        $
+            D_1 =
+            \begin{pmatrix}
+                1 & 0 & 2 & 0 \\ 
+                0 & 2 & 4 & -2 \\ 
+                -1 & 0 & -3 & 1 \\ 
+                0 & -1 & -1 & 0
+            \end{pmatrix} \sim
+            \begin{pmatrix}
+                1 & 0 & 2 & 0 \\ 
+                0 & 1 & 2 & -1 \\ 
+                0 & 0 & -1 & 1 \\ 
+                0 & 0 & 0 & 0
+            \end{pmatrix}
+        $
+        \bigskip\\
+        $
+            D_2 =
+            \begin{pmatrix}
+                1 & -1 & 0 & 2 \\ 
+                -1 & 0 & 1 & -1 \\ 
+                0 & -2 & 0 & 1 \\ 
+                3 & 0 & -1 & 0
+            \end{pmatrix} \sim
+            \begin{pmatrix}
+                1 & -1 & 0 & 2 \\ 
+                0 & 1 & -1 & -1 \\ 
+                0 & 0 & 1 & \frac{3}{2} \\ 
+                0 & 0 & 0 & 1
+            \end{pmatrix}
+        $
+        \bigskip\\
+        So the columns of $D_1$ are linearly dependent, and
+        the columns of $D_2$ are linearly independent.
+
+        % 2
+        \item The maximum number of columns that are linearly
+            independent is 3 for $D_1$ and 4 for $D_2$.
+
+        % 3
+        \item The rank is 3 for $D_1$ and 4 for $D_2$, using
+            the RREF's found in (1)
+
+        % 4
+        \item The sizes only work for $D_1 \theta$ and $\theta^T D_1$:
+        \bigskip\\
+        $
+            D_1 \theta =
+            \begin{pmatrix}
+                1 & 0 & 2 & 0 \\ 
+                0 & 2 & 4 & -2 \\ 
+                -1 & 0 & -3 & 1 \\ 
+                0 & -1 & -1 & 0
+            \end{pmatrix} \cdot 
+            \begin{pmatrix}
+                -1 \\ 
+                0 \\ 
+                1 \\ 
+                2 
+            \end{pmatrix}
+            =
+            \begin{pmatrix}
+                1 \\ 
+                0 \\ 
+                0 \\ 
+                -1 
+            \end{pmatrix}
+        $
+        \bigskip\\
+        $
+            \theta^T D_1 =
+            \begin{pmatrix}
+                -1 &
+                0 &
+                1 &
+                2 
+            \end{pmatrix}
+            \cdot 
+            \begin{pmatrix}
+                1 & 0 & 2 & 0 \\ 
+                0 & 2 & 4 & -2 \\ 
+                -1 & 0 & -3 & 1 \\ 
+                0 & -1 & -1 & 0
+            \end{pmatrix} 
+            =
+            \begin{pmatrix}
+                -2 &
+                -2 &
+                -7 &
+                1 
+            \end{pmatrix}
+        $
+    \end{enumerate}
+\end{s}
+
+\begin{s}\textbf{4} \bigskip \\
+    Let
+    $\text{Anton} = 1$,
+    $\text{Geraldine} = 2$,
+    $\text{James} = 3$,
+    $\text{Lauren} = 4$. \\
+    Let
+    $\text{English} = 1$,
+    $\text{French} = 2$,
+    $\text{German} = 3$,
+    $\text{Italian} = 4$,
+    $\text{Spanish} = 5$.
+    \begin{enumerate} 
+        % 1
+        \item $A =
+            \begin{pmatrix}
+                0 & 1 & 1 & 0 & 0 \\
+                1 & 1 & 0 & 1 & 0 \\
+                1 & 0 & 0 & 1 & 1 \\
+                1 & 0 & 1 & 1 & 1
+            \end{pmatrix}$
+            \bigskip \\
+            $AA^T =
+            \begin{pmatrix}
+                2 & 1 & 0 & 1 \\ 
+                1 & 3 & 2 & 2 \\ 
+                0 & 2 & 3 & 3 \\ 
+                1 & 2 & 3 & 4
+            \end{pmatrix}$
+            \bigskip \\
+            The $(i,j)$-th entry in $AA^T$ is the number of shared
+            languages between person $i$ and person $j$. When
+            $i = j$, the $(i, j)$-th entry counts the number of
+            languages person $i$ speaks.
+            \bigskip \\
+            $A^TA = 
+            \begin{pmatrix}
+                3 & 1 & 1 & 3 & 2 \\ 
+                1 & 2 & 1 & 1 & 0 \\
+                1 & 1 & 2 & 1 & 1 \\
+                3 & 1 & 1 & 3 & 2 \\
+                2 & 0 & 1 & 2 & 2
+            \end{pmatrix}$
+            \bigskip \\
+            The $(i,j)$-th entry in $A^TA$ is the number of
+            shared people between language $i$ and language $j$.
+            When $i = j$, the $(i, j)$-th entry counts the
+            number of people who speak language $i$.
+
+        % 2
+        \item
+            $A = 
+            \begin{pmatrix}
+                -8 & -8 & 9 \\
+                1 & 5 & -6 \\
+                -5 & -10 & -2
+            \end{pmatrix},\;\;\; A^{-1} =
+            \begin{pmatrix}
+                -0.159 & -0.241 & 0.007 \\
+                0.073 & 0.139 & -0.089 \\
+                0.034 & -0.091 & -0.073
+            \end{pmatrix}$
+            \bigskip \\
+            $B = 
+            \begin{pmatrix}
+                3 & -2 & -2 \\
+                -2 & -5 & -4 \\
+                -3 & -5 & -1
+            \end{pmatrix},\;\;\; B^{-1} =
+            \begin{pmatrix}
+                0.273 & -0.145 & 0.036 \\
+                -0.182 & 0.164 & -0.291 \\
+                0.091 & -0.382 & 0.345
+            \end{pmatrix}$
+            \bigskip \\
+            $C = 
+            \begin{pmatrix}
+                -2 & -9 & 10 \\
+                -7 & 0 & -5 \\
+                -9 & -10 & 0
+            \end{pmatrix},\;\;\; C^{-1} =
+            \begin{pmatrix}
+                -0.127 & -0.253 & 0.114 \\
+                0.114 & 0.228 & -0.203 \\
+                0.177 & 0.154 & -0.159
+            \end{pmatrix}$
+    \end{enumerate}
+\end{s}
+
+\begin{s}\textbf{5}
+    \begin{enumerate} 
+        % 1
+        \item Lowest mean: \texttt{long} (-122.214), higest mean: \texttt{price} (540,088.142). \\
+            Lowest variance: \texttt{waterfront} (0.007), higest variance: \texttt{price} (134,776,142,225.573).
+
+        % 2
+        \item All of the features are positively correlated
+            with \texttt{price}: \bigskip \\
+            \begin{tabular}{c c}
+                feature & corr with \texttt{price} \\
+                \hline
+                \texttt{long}             & 0.021626 \\
+                \texttt{condition}        & 0.036362 \\
+                \texttt{yr\_built}         & 0.054012 \\
+                \texttt{sqft\_lot15}       & 0.082447 \\
+                \texttt{sqft\_lot}         & 0.089661 \\
+                \texttt{yr\_renovated}     & 0.126434 \\
+                \texttt{floors}           & 0.256794 \\
+                \texttt{waterfront}       & 0.266369 \\
+                \texttt{lat}              & 0.307003 \\
+                \texttt{bedrooms}         & 0.308350 \\
+                \texttt{sqft\_basement}    & 0.323816 \\
+                \texttt{view}             & 0.397293 \\
+                \texttt{bathrooms}        & 0.525138 \\
+                \texttt{sqft\_living15}    & 0.585379 \\
+                \texttt{sqft\_above}       & 0.605567 \\
+                \texttt{grade}            & 0.667434 \\
+                \texttt{sqft\_living}      & 0.702035
+            \end{tabular} \bigskip \\
+            The feature with the highest correlation is \texttt{sqft\_living}.
+
+        % 3
+        \item No
+
+    \end{enumerate}
+\end{s}
+\end{document}
