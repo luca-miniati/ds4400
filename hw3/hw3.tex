@@ -1,0 +1,101 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath, amssymb, amsthm, hyperref}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\theoremstyle{definition}
+\newtheoremstyle{nopunct}%
+{}{}% Space above/below
+{}% Body font
+{}% Indent
+{\bfseries}% Head font
+{}% No punctuation
+{ }% Space after head
+{}% Head spec
+
+\theoremstyle{nopunct}
+\newtheorem*{s}{Solution}
+
+\begin{document}
+
+Link to code: 
+\href{https://github.com/luca-miniati/ds4400/blob/main/hw3/hw3.ipynb}
+{https://github.com/luca-miniati/ds4400/blob/main/hw3/hw3.ipynb}
+
+\begin{s}
+\textbf{1}
+
+\begin{enumerate}
+  \item Implemented in code
+  \item The top 10 most predictive features with their coefficients are:
+
+    \begin{center}
+      \begin{tabular}{|c|l|r|}
+        \hline
+        Rank & Feature & Coefficient \\
+        \hline
+        1 & word\_freq\_george  & -3.746023 \\
+        2 & char\_freq\_\$      & 3.532032 \\
+        3 & word\_freq\_000     & 2.023771 \\
+        4 & word\_freq\_hp      & -2.023331 \\
+        5 & word\_freq\_remove  & 1.972562 \\
+        6 & word\_freq\_meeting & -1.858157 \\
+        7 & word\_freq\_edu     & -1.627047 \\
+        8 & word\_freq\_project & -1.330245 \\
+        9 & word\_freq\_lab     & -1.316705 \\
+        10 & char\_freq\_\#     & 1.305303 \\
+        \hline
+      \end{tabular}
+    \end{center}
+
+  \item As $T$ increased, precision increased and recall decreased. Accuracy
+    peaked at $T = 0.5$.
+
+\end{enumerate}
+
+\end{s}
+
+\vspace{10pt}
+
+\begin{s}
+  \textbf{2}
+
+  \begin{enumerate}
+  \item The sklearn model performed way better than my implementation. Probably,
+    scaling the data and training for longer would help.
+
+  \end{enumerate}
+
+\end{s}
+
+\vspace{10pt}
+
+\begin{s}
+  \textbf{3}
+
+  \begin{enumerate}
+    \item Implemented in code
+    \item The best model was Logistic Regression. Second-best was LDA, and KNN
+      performed worst.
+    \item Implemented in code
+    \item To make the manual ROC curve more like the sklearn one, I can use more
+      thresholds.
+  \end{enumerate}
+
+\end{s}
+
+\vspace{10pt}
+
+\begin{s}
+  \textbf{4}
+
+  \begin{enumerate}
+    \item Implemented in code
+    \item Implemented in code
+    \item For both values of $k$, Logistic Regression had lower error.
+  \end{enumerate}
+
+\end{s}
+
+\end{document}
