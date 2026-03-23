@@ -30,17 +30,20 @@ def _parse_pdb_line_simple(line: str) -> PdbRow | None:
     parts = line.split()
     if len(parts) < 11:
         return None
-    player = parts[0]
-    hand_id = parts[1]
-    n_players = int(parts[2])
-    position = int(parts[3])
-    preflop = parts[4]
-    flop = parts[5]
-    turn = parts[6]
-    river = parts[7]
-    stack = int(parts[8])
-    bet1 = int(parts[9])
-    bet2 = int(parts[10])
+    try:
+        player = parts[0]
+        hand_id = parts[1]
+        n_players = int(parts[2])
+        position = int(parts[3])
+        preflop = parts[4]
+        flop = parts[5]
+        turn = parts[6]
+        river = parts[7]
+        stack = int(parts[8]) if parts[8] != "-" else 0
+        bet1 = int(parts[9]) if parts[9] != "-" else 0
+        bet2 = int(parts[10]) if parts[10] != "-" else 0
+    except (ValueError, IndexError):
+        return None
     hole = None
     if len(parts) >= 13 and CARD_PATTERN.match(parts[11]) and CARD_PATTERN.match(parts[12]):
         hole = f"{parts[11]} {parts[12]}"

@@ -3,6 +3,6 @@ __pycache__/
 *.pyc
 .pytest_cache/
 *.egg-info/
-data/phh/
+data/
 **/IRCdata.tgz
 **/IRCdata/

@@ -25,10 +25,13 @@ final/
 ├── src/                  # Core library
 │   ├── irc_parser/       # IRC format parsers (hdb, hroster, pdb)
 │   ├── phh_converter/    # IRC → PokerKit PHH conversion
+│   ├── feature_extraction/  # ML feature extraction from PHH
 │   ├── json_export.py    # JSON export for ML
 │   └── pipeline.py       # Pipeline orchestration
 ├── scripts/              # Utility scripts
 │   ├── count_hole_cards.py
+│   ├── extract_features.py   # Extract 28 features to CSV/Parquet
+│   ├── describe_features.py  # Summarize extracted dataset
 │   ├── show_phh_sample.py
 │   └── validate_position_mapping.py
 ├── tests/                # Unit tests
@@ -37,7 +40,8 @@ final/
 ├── proposal.md           # Project proposal
 └── data/
     ├── IRCdata/          # Input: IRC hand history (place here)
-    └── phh/              # Output: generated JSON and PHH
+    ├── phh/              # Output: generated JSON and PHH
+    └── ml/               # ML-ready dataset (from extract_features)
 ```
 
 ---
@@ -85,17 +89,67 @@ data/phh/
 
 The pipeline discovers `holdem1`, `holdem2`, `holdem3` (NLH) paths under the IRC root, merges by `hand_id`, and reconstructs the action sequence for PokerKit validation.
 
+### Limitations
+
+IRC stores per-player action summaries (e.g., `Bc` = blind+call) rather than a full chronological log. Reconstructing the exact sequence for PokerKit validation is heuristic-based; some hands fail conversion. **The JSON export is the recommended output** for ML—it contains all parsed data including hole cards at showdown.
+
 ### Scripts
 
 | Script                     | Purpose                                              |
 |----------------------------|------------------------------------------------------|
 | `count_hole_cards.py`      | Compare hole card coverage in JSON vs PHH output     |
+| `extract_features.py`      | Extract 28 features + labels to CSV/Parquet for ML   |
+| `describe_features.py`     | Summarize extracted dataset (labels, feature stats)  |
+| `train_models.py`          | Train Logistic Regression and Gradient Boosted Trees |
 | `show_phh_sample.py`       | Print sample hands from PHH files in readable format |
 | `validate_position_mapping.py` | Validate IRC roster vs PDB position alignment    |
 
-### Limitations
+---
 
-IRC stores per-player action summaries (e.g., `Bc` = blind+call) rather than a full chronological log. Reconstructing the exact sequence for PokerKit validation is heuristic-based; some hands fail conversion. **The JSON export is the recommended output** for ML—it contains all parsed data including hole cards at showdown.
+## Feature Extraction (ML Dataset)
+
+The feature extraction pipeline turns PHH hand histories into an ML-ready dataset with **28 proposal features** and **fold/call/raise** labels.
+
+### Quick Start
+
+```bash
+# Extract from PHH to CSV (default: data/phh/phh -> data/ml/decisions.csv)
+.venv/bin/python scripts/extract_features.py
+
+# Limit for testing
+.venv/bin/python scripts/extract_features.py -l 1000 --limit-files 2
+
+# Output Parquet instead
+.venv/bin/python scripts/extract_features.py -o data/ml/decisions.parquet -f parquet
+
+# Describe the dataset
+.venv/bin/python scripts/describe_features.py data/ml/decisions.csv
+```
+
+### Features (28 total)
+
+- **Draw** (2): flush draw, straight draw (require hole cards; -1 when unknown)
+- **Board texture** (8): suited count, runs, pair/trips, monotone/two-tone/rainbow, highest rank
+- **Pot/betting** (9): pot (BB), effective stack, SPR, pot odds, facing bet, all-in, commitment %, MDF
+- **Action** (5): opponent aggressive/passive counts, last two actions, check-raise, donk
+- **Game state** (4): hero/villain position, preflop aggressor, street
+
+Hole cards are only available at showdown (from JSON). Draw features use -1 when unknown. Use `-j` to point at the JSON directory for showdown hole cards.
+
+---
+
+## Model Training (Luca's models)
+
+Train Logistic Regression and Gradient Boosted Trees:
+
+```bash
+.venv/bin/python scripts/train_models.py
+
+# Faster test run (subset)
+.venv/bin/python scripts/train_models.py -l 50000
+```
+
+Models and metrics are saved to `data/ml/models/` (`.joblib` models, `metrics.json` with F1 and confusion matrices).
 
 ---
 
