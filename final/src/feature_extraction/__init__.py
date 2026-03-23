@@ -7,7 +7,6 @@ from .decision_points import (
 )
 from .export import (
     export_decisions_to_csv,
-    export_decisions_to_parquet,
     run_extraction,
 )
 from .features import FEATURE_NAMES, compute_features
@@ -18,7 +17,6 @@ __all__ = [
     "compute_features",
     "extract_decision_points_from_phh",
     "export_decisions_to_csv",
-    "export_decisions_to_parquet",
     "load_phh_directory",
     "run_extraction",
 ]

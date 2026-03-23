@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 from typing import Iterator
 
-from .decision_points import DecisionPoint, extract_decision_points_from_phh, load_phh_directory
+from .decision_points import DecisionPoint, load_phh_directory
 from .features import FEATURE_NAMES, compute_features
 
 
