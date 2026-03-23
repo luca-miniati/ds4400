@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Train Luca's models: Logistic Regression and Gradient Boosted Trees."""
+"""Train models: Logistic Regression and Gradient Boosted Trees."""
 
 import argparse
 import json
