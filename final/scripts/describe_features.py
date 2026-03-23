@@ -3,6 +3,7 @@
 
 import argparse
 from pathlib import Path
+import pandas as pd
 
 REPO = Path(__file__).resolve().parent.parent
 
@@ -15,7 +16,7 @@ def main() -> None:
         "path",
         type=Path,
         nargs="?",
-        default=REPO / "data" / "ml" / "decisions.csv",
+        default=REPO / "data" / "out" / "decisions.csv",
         help="Path to decisions CSV or Parquet (default: data/ml/decisions.csv)",
     )
     ap.add_argument(
@@ -33,16 +34,8 @@ def main() -> None:
         print("Run extract_features.py first.")
         return
 
-    try:
-        import pandas as pd
-    except ImportError:
-        print("pandas is required. Install with: pip install pandas")
-        return
 
-    if path.suffix.lower() == ".parquet":
-        df = pd.read_parquet(path)
-    else:
-        df = pd.read_csv(path)
+    df = pd.read_csv(path)
 
     print(f"Dataset: {path}")
     print(f"Rows: {len(df)}")

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Extract full ML dataset from PHH files.
-# Output: data/ml/decisions.csv (or .parquet)
-# Run from project root: ./scripts/extract_ml_dataset.sh
+# Extract full ML dataset from phh files.
+# Output: data/ml/decisions.csv
+# Run from project root: ./scripts/extract_dataset.sh
 
 set -e
 
@@ -11,22 +11,21 @@ cd "$REPO"
 VENV_PYTHON="${REPO}/.venv/bin/python"
 PHH_DIR="${REPO}/data/phh/phh"
 JSON_DIR="${REPO}/data/phh/json"
-OUTPUT_CSV="${REPO}/data/ml/decisions.csv"
-OUTPUT_PARQUET="${REPO}/data/ml/decisions.parquet"
+OUTPUT_CSV="${REPO}/data/out/decisions.csv"
+OUTPUT_PARQUET="${REPO}/data/out/decisions.parquet"
 
 if [[ ! -d "$PHH_DIR" ]]; then
   echo "Error: PHH directory not found: $PHH_DIR"
   exit 1
 fi
 
-mkdir -p "${REPO}/data/ml"
+mkdir -p "${REPO}/data/out"
 
 echo "Extracting ML dataset from PHH files..."
 echo "  PHH dir: $PHH_DIR"
 echo "  JSON dir: $JSON_DIR (for hole cards at showdown)"
 echo ""
 
-# Extract to CSV (default). Use -f parquet for Parquet.
 "$VENV_PYTHON" scripts/extract_features.py \
   "$PHH_DIR" \
   -o "$OUTPUT_CSV" \

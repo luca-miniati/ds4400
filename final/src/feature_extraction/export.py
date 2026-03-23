@@ -84,24 +84,6 @@ def export_decisions_to_csv(
             w.writerow(row)
 
 
-def export_decisions_to_parquet(
-    decisions: list[DecisionPoint],
-    output_path: Path,
-    bb: int = 10,
-    hole_cards_map: dict[str, dict[str, list[str]]] | None = None,
-) -> None:
-    """Write decisions with features to Parquet. Requires pyarrow or pandas."""
-    try:
-        import pandas as pd
-    except ImportError:
-        raise ImportError("Parquet export requires pandas. Install with: pip install pandas pyarrow")
-    output_path = Path(output_path)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    rows = list(extract_features_for_decisions(decisions, bb, hole_cards_map))
-    df = pd.DataFrame(rows)
-    df.to_parquet(output_path, index=False)
-
-
 def run_extraction(
     phh_dir: Path,
     output_path: Path,
@@ -128,10 +110,7 @@ def run_extraction(
         hole_cards_map = _load_hole_cards_from_json(Path(json_dir), hand_ids)
 
     output_path = Path(output_path)
-    if format.lower() == "parquet":
-        export_decisions_to_parquet(decisions, output_path, bb, hole_cards_map)
-    else:
-        export_decisions_to_csv(decisions, output_path, bb, hole_cards_map)
+    export_decisions_to_csv(decisions, output_path, bb, hole_cards_map)
 
     n_hands = len(hand_ids)
     return n_decisions, n_hands

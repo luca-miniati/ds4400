@@ -22,8 +22,8 @@ def main() -> None:
         "-o",
         "--output",
         type=Path,
-        default=REPO / "data" / "ml" / "decisions.csv",
-        help="Output path (default: data/ml/decisions.csv)",
+        default=REPO / "data" / "out" / "decisions.csv",
+        help="Output path (default: data/out/decisions.csv)",
     )
     ap.add_argument(
         "-j",
@@ -64,12 +64,6 @@ def main() -> None:
         default="csv",
         help="Output format (default: csv)",
     )
-    ap.add_argument(
-        "-q",
-        "--quiet",
-        action="store_true",
-        help="Suppress progress output",
-    )
     args = ap.parse_args()
 
     sys_path = REPO
@@ -89,9 +83,7 @@ def main() -> None:
         format=args.format,
     )
 
-    if not args.quiet:
-        ext = ".parquet" if args.format == "parquet" else ".csv"
-        print(f"Wrote {n_decisions} decision points from ~{n_hands} hands to {args.output}")
+    print(f"Wrote {n_decisions} decision points from ~{n_hands} hands to {args.output}")
 
 
 if __name__ == "__main__":

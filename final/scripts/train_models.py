@@ -63,7 +63,7 @@ def load_and_prepare(data_path: Path) -> tuple[np.ndarray, np.ndarray]:
         if col in df.columns:
             df[col] = df[col].replace(-1, 0)
     X = df[FEATURE_COLS].fillna(0).values
-    y = df[LABEL_COL].cat.codes.values
+    y = np.array(df[LABEL_COL].cat.codes.values)
     return X, y
 
 
@@ -73,21 +73,21 @@ def main() -> None:
         "data",
         type=Path,
         nargs="?",
-        default=REPO / "data" / "ml" / "decisions.csv",
+        default=REPO / "data" / "out" / "decisions.csv",
         help="Path to decisions CSV",
     )
     ap.add_argument(
         "-o",
         "--output-dir",
         type=Path,
-        default=REPO / "data" / "ml" / "models",
+        default=REPO / "data" / "out",
         help="Directory to save models and metrics",
     )
     ap.add_argument(
         "--test-size",
         type=float,
         default=0.2,
-        help="Fraction for test set (default: 0.2)",
+        help="Proportion for test set (default: 0.2)",
     )
     ap.add_argument(
         "--seed",
@@ -107,7 +107,7 @@ def main() -> None:
         "--log-file",
         type=Path,
         default=None,
-        help="Write output to file (default: output-dir/train.log)",
+        help="Write output to file (default: out/train.log)",
     )
     args = ap.parse_args()
 
@@ -131,8 +131,6 @@ def main() -> None:
 
 
 def _run_training(args, output_dir: Path) -> None:
-    import joblib
-
     print("Loading data...")
     X, y = load_and_prepare(args.data)
     if args.limit:
@@ -149,7 +147,6 @@ def _run_training(args, output_dir: Path) -> None:
 
     results = {}
 
-    # --- Logistic Regression ---
     print("\n--- Logistic Regression ---")
     lr = LogisticRegression(
         max_iter=1000,
@@ -173,13 +170,6 @@ def _run_training(args, output_dir: Path) -> None:
         "confusion_matrix": cm_lr.tolist(),
     }
 
-    import joblib
-
-    joblib.dump(lr, output_dir / "logistic_regression.joblib")
-    joblib.dump(scaler, output_dir / "scaler.joblib")
-    print(f"  Saved to {output_dir / 'logistic_regression.joblib'}")
-
-    # --- Gradient Boosted Trees ---
     print("\n--- Gradient Boosted Trees ---")
     gbt = GradientBoostingClassifier(
         n_estimators=100,
@@ -187,7 +177,7 @@ def _run_training(args, output_dir: Path) -> None:
         learning_rate=0.1,
         random_state=args.seed,
     )
-    gbt.fit(X_train, y_train)  # GBT often works better without scaling
+    gbt.fit(X_train, y_train)
     y_pred_gbt = gbt.predict(X_test)
 
     f1_macro_gbt = f1_score(y_test, y_pred_gbt, average="macro")
@@ -204,10 +194,6 @@ def _run_training(args, output_dir: Path) -> None:
         "confusion_matrix": cm_gbt.tolist(),
     }
 
-    joblib.dump(gbt, output_dir / "gradient_boosted_trees.joblib")
-    print(f"  Saved to {output_dir / 'gradient_boosted_trees.joblib'}")
-
-    # --- Summary ---
     with open(output_dir / "metrics.json", "w") as f:
         json.dump(results, f, indent=2)
 
