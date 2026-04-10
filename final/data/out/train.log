@@ -1,0 +1,44 @@
+Loading data...
+  Samples: 444304, Features: 29
+
+--- Logistic Regression ---
+  F1 (macro):    0.6670
+  F1 (weighted): 0.6663
+  Confusion matrix:
+[[16565  6499  3798]
+ [ 9066 20548  4236]
+ [ 2708  3250 22191]]
+
+--- Gradient Boosted Trees ---
+  F1 (macro):    0.8862
+  F1 (weighted): 0.8853
+  Confusion matrix:
+[[24199  2239   424]
+ [ 4750 28095  1005]
+ [ 1006   801 26342]]
+
+--- Classification reports ---
+Logistic Regression:
+              precision    recall  f1-score   support
+
+        call       0.58      0.62      0.60     26862
+        fold       0.68      0.61      0.64     33850
+       raise       0.73      0.79      0.76     28149
+
+    accuracy                           0.67     88861
+   macro avg       0.67      0.67      0.67     88861
+weighted avg       0.67      0.67      0.67     88861
+
+Gradient Boosted Trees:
+              precision    recall  f1-score   support
+
+        call       0.81      0.90      0.85     26862
+        fold       0.90      0.83      0.86     33850
+       raise       0.95      0.94      0.94     28149
+
+    accuracy                           0.88     88861
+   macro avg       0.89      0.89      0.89     88861
+weighted avg       0.89      0.88      0.89     88861
+
+
+Metrics saved to /home/luca-miniati/ds4400/final/data/out/metrics.json
