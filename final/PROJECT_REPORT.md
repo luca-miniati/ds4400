@@ -4,7 +4,7 @@
 
 **Team Members:** Luca Miniati, Chigozirim Ike  
 
-**Include link to code:** https://github.com/luca-miniati/ds4400 (final project in `final/` directory)  
+**Link to code:** https://github.com/luca-miniati/ds4400/tree/main/final
 
 **Include link to video recording:** *(fill in)*  
 
