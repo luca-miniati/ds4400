@@ -57,13 +57,6 @@ def main() -> None:
         default=10,
         help="Big blind size for pot/stack normalization (default: 10)",
     )
-    ap.add_argument(
-        "-f",
-        "--format",
-        choices=["csv", "parquet"],
-        default="csv",
-        help="Output format (default: csv)",
-    )
     args = ap.parse_args()
 
     sys_path = REPO
@@ -80,7 +73,6 @@ def main() -> None:
         bb=args.bb,
         limit_hands=args.limit_hands,
         limit_files=args.limit_files,
-        format=args.format,
     )
 
     print(f"Wrote {n_decisions} decision points from ~{n_hands} hands to {args.output}")

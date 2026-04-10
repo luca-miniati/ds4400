@@ -35,13 +35,6 @@ def hand_to_dict(hand: IRCHand) -> dict:
     }
 
 
-def export_hands_json(hands: dict[str, IRCHand], path: Path) -> None:
-    """Export hands to a JSON file."""
-    data = {hid: hand_to_dict(h) for hid, h in hands.items()}
-    with open(path, "w") as f:
-        json.dump(data, f, indent=2)
-
-
 def export_hands_json_batched(
     hands: dict[str, IRCHand],
     output_dir: Path,
@@ -66,12 +59,3 @@ def export_hands_json_batched(
             json.dump(batch, f, indent=2)
         written.append(out_path)
     return written
-
-
-def export_hands_jsonl(hands: dict[str, IRCHand], path: Path) -> None:
-    """Export hands to JSONL (one JSON object per line)."""
-    with open(path, "w") as f:
-        for hid, hand in hands.items():
-            rec = hand_to_dict(hand)
-            rec["hand_id"] = hid
-            f.write(json.dumps(rec) + "\n")

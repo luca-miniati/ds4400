@@ -12,7 +12,6 @@ VENV_PYTHON="${REPO}/.venv/bin/python"
 PHH_DIR="${REPO}/data/phh/phh"
 JSON_DIR="${REPO}/data/phh/json"
 OUTPUT_CSV="${REPO}/data/out/decisions.csv"
-OUTPUT_PARQUET="${REPO}/data/out/decisions.parquet"
 
 if [[ ! -d "$PHH_DIR" ]]; then
   echo "Error: PHH directory not found: $PHH_DIR"

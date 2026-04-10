@@ -3,7 +3,7 @@
 from pathlib import Path
 
 from .irc_parser import merge_hands
-from .json_export import export_hands_json, export_hands_json_batched
+from .json_export import export_hands_json_batched
 from .phh_converter import convert_to_hand_history
 
 

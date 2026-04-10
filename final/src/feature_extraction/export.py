@@ -92,7 +92,6 @@ def run_extraction(
     bb: int = 10,
     limit_hands: int | None = None,
     limit_files: int | None = None,
-    format: str = "csv",
 ) -> tuple[int, int]:
     """
     Full extraction: load PHH, optionally merge hole cards from JSON, export.

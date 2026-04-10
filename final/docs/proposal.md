@@ -22,12 +22,11 @@ interesting because players often follow simple or inconsistent heuristics,
 which allows comparison between linear and highly flexible models.
 
 ## Dataset
-- Source: https://github.com/allenfrostline/PokerHandsDataset
-- The dataset contains NLH hand histories with features describing hole hards,
+- Source: https://poker.cs.ualberta.ca/IRC/IRCdata.tgz (IRC Poker Database)
+- The dataset contains NLH hand histories with features describing hole cards,
 community cards, and action history.
-- There are ~9,500,000 hand histories in the dataset.
-- The pool of features to be chosen from is large. So far, we have idendified
-28 relevant features.
+- The pipeline produces ~444,304 decision points (fold/call/raise moments) from the NLH hand histories.
+- We identified 29 relevant features across five groups: draw, board texture, pot/betting, action, and game state.
 
 ## Approach and methodology
 - Feature selection
@@ -56,7 +55,8 @@ community cards, and action history.
     - Action Features
         - Count of aggressive actions made by opponent
         - Count of passive actions made by opponent
-        - One-hot encoding of last two actions
+        - Last action (index 1)
+        - Last action (index 2)
         - Villain check-raise indicator
         - Villain donk bet indicator
     - Game State Features
@@ -64,8 +64,7 @@ community cards, and action history.
         - Villain Position index
         - Preflop aggressor indicator
         - Street index
-- The main task will be to predict call/fold/raise (for Logistic
-Regression, call/fold will be used instead)
+- The main task will be to predict call/fold/raise (3-class multinomial classification for all models)
 - Machine learning models
     - Logistic Regression
     - Multinomial Logistic Regression
