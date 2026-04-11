@@ -4,7 +4,9 @@
 
 Predicting player actions (fold, call, raise) in No-Limit Texas Hold'em using game-state features. This repository includes the data processing pipeline and supports downstream ML modeling (Logistic Regression, Random Forest, Gradient Boosted Trees, RNNs).
 
-See [proposal.md](proposal.md) for the full project proposal.
+See [proposal.md](docs/proposal.md) for the full project proposal.
+
+See [PROJECT_REPORT.md](PROJECT_REPORT.md) for the final project report.
 
 ---
 
