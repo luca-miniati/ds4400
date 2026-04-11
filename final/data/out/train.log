@@ -17,6 +17,38 @@ Loading data...
  [ 4750 28095  1005]
  [ 1006   801 26342]]
 
+--- Multinomial Logistic Regression (L1 / saga) ---
+  F1 (macro):    0.6671
+  F1 (weighted): 0.6663
+  Confusion matrix:
+[[16557  6507  3798]
+ [ 9063 20553  4234]
+ [ 2707  3246 22196]]
+
+--- Random Forest ---
+  F1 (macro):    0.9047
+  F1 (weighted): 0.9039
+  Confusion matrix:
+[[23943  2561   358]
+ [ 3676 29276   898]
+ [  540   505 27104]]
+
+--- RNN (LSTM) ---
+  Device: mps
+  Epoch   1 | train_loss=0.6693 | val_loss=0.4980
+  Epoch   5 | train_loss=0.3661 | val_loss=0.3398
+  Epoch  10 | train_loss=0.3123 | val_loss=0.2966
+  Epoch  15 | train_loss=0.2903 | val_loss=0.2872
+  Epoch  20 | train_loss=0.2765 | val_loss=0.2700
+  Epoch  25 | train_loss=0.2671 | val_loss=0.2567
+  Epoch  30 | train_loss=0.2607 | val_loss=0.2518
+  F1 (macro):    0.8817
+  F1 (weighted): 0.8808
+  Confusion matrix:
+[[23422  2980   460]
+ [ 4560 28407   883]
+ [  743  1000 26406]]
+
 --- Classification reports ---
 Logistic Regression:
               precision    recall  f1-score   support
@@ -40,5 +72,38 @@ Gradient Boosted Trees:
    macro avg       0.89      0.89      0.89     88861
 weighted avg       0.89      0.88      0.89     88861
 
+Multinomial Logistic Regression (L1):
+              precision    recall  f1-score   support
 
-Metrics saved to /home/luca-miniati/ds4400/final/data/out/metrics.json
+        call       0.58      0.62      0.60     26862
+        fold       0.68      0.61      0.64     33850
+       raise       0.73      0.79      0.76     28149
+
+    accuracy                           0.67     88861
+   macro avg       0.67      0.67      0.67     88861
+weighted avg       0.67      0.67      0.67     88861
+
+Random Forest:
+              precision    recall  f1-score   support
+
+        call       0.85      0.89      0.87     26862
+        fold       0.91      0.86      0.88     33850
+       raise       0.96      0.96      0.96     28149
+
+    accuracy                           0.90     88861
+   macro avg       0.90      0.91      0.90     88861
+weighted avg       0.90      0.90      0.90     88861
+
+RNN (LSTM):
+              precision    recall  f1-score   support
+
+        call       0.82      0.87      0.84     26862
+        fold       0.88      0.84      0.86     33850
+       raise       0.95      0.94      0.94     28149
+
+    accuracy                           0.88     88861
+   macro avg       0.88      0.88      0.88     88861
+weighted avg       0.88      0.88      0.88     88861
+
+
+Metrics saved to data/out/metrics.json

@@ -54,7 +54,7 @@ Features are organized into five groups:
 4. **Action (6):** `opp_aggressive_count`, `opp_passive_count`, `last_action_1`, `last_action_2`, `villain_checkraise`, `villain_donk`
 5. **Game state (4):** `hero_position`, `villain_position`, `preflop_aggressor_is_hero`, `street_index`
 
-**Preprocessing:** Unknown draw and rank values (-1) are imputed to 0 for training. Missing values are filled with 0. Standard scaling is applied for Logistic Regression; Gradient Boosted Trees use raw features.
+**Preprocessing:** Unknown draw and rank values (-1) are imputed to 0 for training. Missing values are filled with 0. Standard scaling is applied for Logistic Regression, Multinomial LR, and the RNN; tree-based models (GBT, Random Forest) use raw features.
 
 ### Visualizations
 
@@ -170,8 +170,11 @@ Saves all figures to `data/out/figures/`. Pass `--skip-models` to only generate 
 
 ### Models Trained
 
-1. **Logistic Regression**: Multinomial via `sklearn.linear_model.LogisticRegression` with L-BFGS solver, max_iter=1000. Inputs are StandardScaler-normalized.
-2. **Gradient Boosted Trees**: `sklearn.ensemble.GradientBoostingClassifier` with 100 estimators, max_depth=6, learning_rate=0.1.
+1. **Logistic Regression** *(Luca)*: Multinomial via `sklearn.linear_model.LogisticRegression` with L-BFGS solver, max_iter=1000. Inputs are StandardScaler-normalized.
+2. **Gradient Boosted Trees** *(Luca)*: `sklearn.ensemble.GradientBoostingClassifier` with 100 estimators, max_depth=6, learning_rate=0.1.
+3. **Multinomial Logistic Regression with L1** *(Chigo)*: `sklearn.linear_model.LogisticRegression` with SAGA solver and L1 regularization (`l1_ratio=1.0`, `C=1.0`, `max_iter=2000`). The L1 penalty performs feature selection by driving irrelevant coefficients to zero, testing whether a sparser linear model can match or exceed the default L2-regularized LR. Inputs are StandardScaler-normalized.
+4. **Random Forest** *(Chigo)*: `sklearn.ensemble.RandomForestClassifier` with 200 estimators, no max depth limit, `min_samples_split=5`, `min_samples_leaf=2`, `max_features="sqrt"`. Parallelized with `n_jobs=-1`. Uses raw (unscaled) features.
+5. **RNN (LSTM)** *(Chigo)*: A 2-layer LSTM network built in PyTorch. Each sample's 29 scaled features are reshaped as a length-29 sequence (1 feature per timestep). The feature ordering (draw → board texture → pot/betting → action → game state) provides a natural progression from private to public information. Architecture: LSTM(input=1, hidden=64, layers=2, dropout=0.3) → Dropout(0.3) → Linear(64, 3). Trained with Adam (lr=1e-3), ReduceLROnPlateau scheduler, and early stopping (patience=5) on a 10% validation split. Batch size 512, up to 30 epochs.
 
 ### Methodology
 
@@ -194,13 +197,25 @@ Saves all figures to `data/out/figures/`. Pass `--skip-models` to only generate 
 | Model | F1 (macro) | F1 (weighted) |
 |-------|------------|---------------|
 | Logistic Regression | 0.6670 | 0.6663 |
-| Gradient Boosted Trees | **0.8862** | **0.8853** |
+| Multinomial LR (L1/saga) | 0.6671 | 0.6663 |
+| Gradient Boosted Trees | 0.8862 | 0.8853 |
+| RNN (LSTM) | 0.8817 | 0.8808 |
+| **Random Forest** | **0.9047** | **0.9039** |
 
 ![Confusion Matrices](data/out/figures/confusion_matrices.png)
 
 ### Classification Reports (test set, `n=88,861`)
 
 **Logistic Regression:**
+
+| Class | Precision | Recall | F1-Score | Support |
+|-------|-----------|--------|----------|---------|
+| call | 0.58 | 0.62 | 0.60 | 26,862 |
+| fold | 0.68 | 0.61 | 0.64 | 33,850 |
+| raise | 0.73 | 0.79 | 0.76 | 28,149 |
+| **accuracy** | | | **0.67** | 88,861 |
+
+**Multinomial Logistic Regression (L1/saga):**
 
 | Class | Precision | Recall | F1-Score | Support |
 |-------|-----------|--------|----------|---------|
@@ -218,6 +233,24 @@ Saves all figures to `data/out/figures/`. Pass `--skip-models` to only generate 
 | raise | 0.95 | 0.94 | 0.94 | 28,149 |
 | **accuracy** | | | **0.88** | 88,861 |
 
+**Random Forest:**
+
+| Class | Precision | Recall | F1-Score | Support |
+|-------|-----------|--------|----------|---------|
+| call | 0.85 | 0.89 | 0.87 | 26,862 |
+| fold | 0.91 | 0.86 | 0.88 | 33,850 |
+| raise | 0.96 | 0.96 | 0.96 | 28,149 |
+| **accuracy** | | | **0.90** | 88,861 |
+
+**RNN (LSTM):**
+
+| Class | Precision | Recall | F1-Score | Support |
+|-------|-----------|--------|----------|---------|
+| call | 0.82 | 0.87 | 0.84 | 26,862 |
+| fold | 0.88 | 0.84 | 0.86 | 33,850 |
+| raise | 0.95 | 0.94 | 0.94 | 28,149 |
+| **accuracy** | | | **0.88** | 88,861 |
+
 ### ROC Curves
 
 One-vs-rest ROC curves for each class (call, fold, raise):
@@ -229,16 +262,34 @@ One-vs-rest ROC curves for each class (call, fold, raise):
 | Logistic Regression | 0.832 | 0.816 | 0.916 |
 | Gradient Boosted Trees | **0.973** | **0.970** | **0.994** |
 
-GBT achieves near-perfect AUC for raise (0.994). This shows that raise decisions are the most predictable, because players nearly always raise with strong made hands or draws in favorable positions. The fold/call boundary is harder for both models (lowest AUC per class).
+All five models' ROC curves are shown in the figure above. GBT achieves near-perfect AUC for raise (0.994). Raise decisions are the most predictable across all models, because players nearly always raise with strong made hands or draws in favorable positions. The fold/call boundary is the hardest for all models (lowest AUC per class).
 
 ---
 
 ## 5. Discussion and Result Interpretation
 
-### Why Gradient Boosted Trees Outperform Logistic Regression
+### Model Comparison
 
-- **Nonlinearity:** GBT captures nonlinear interactions that a linear model cannot.
-- **Feature combinations:** Board texture, pot odds, and action history interact in complex ways. GBT is able to model these interactions between features better than LR.
+The five models fall into three distinct performance tiers:
+
+1. **Linear models (~67% F1):** Both Logistic Regression variants (L-BFGS/L2 and SAGA/L1) achieve nearly identical performance at ~0.667 macro F1. The L1-regularized Multinomial LR did not improve over the standard LR, indicating that all 29 features carry some predictive signal and none can be safely zeroed out. This confirms that the feature set was well-designed — no redundant features were included.
+
+2. **Nonlinear ensemble models (89–90% F1):** Gradient Boosted Trees (0.886) and Random Forest (0.905) both achieve strong results. Random Forest is the best-performing model overall, outperforming GBT by ~2 percentage points. This may be because Random Forest's bagging approach is more robust to the inherent noise in low-stakes poker data, while GBT's sequential boosting can overfit to noisy patterns.
+
+3. **Neural network (~88% F1):** The RNN (LSTM) achieves 0.882 macro F1, competitive with GBT but slightly below Random Forest. This is a strong result given that LSTMs are designed for sequential data and the features are tabular. The fact that the LSTM approaches tree-based performance suggests that the ordered feature groups (draw → board → pot → action → game state) do encode useful sequential structure.
+
+### Why Nonlinear Models Outperform Linear Models
+
+- **Nonlinearity:** Tree-based models and the LSTM capture nonlinear interactions that a linear model cannot. In poker, the same pot odds might lead to a fold with a weak hand but a raise with a strong draw — interactions that require nonlinear decision boundaries.
+- **Feature combinations:** Board texture, pot odds, and action history interact in complex ways. For example, a large bet on a monotone board (potential flush) has a very different meaning than a large bet on a dry board. Tree-based models handle these interactions naturally through splits.
+
+### Why Random Forest Beats GBT
+
+Random Forest's advantage likely comes from its robustness to noise via bagging: each tree sees a different bootstrap sample, which averages out the inconsistent play patterns of low-stakes players. GBT, by contrast, sequentially fits residuals and may overfit to idiosyncratic patterns in the training data. Additionally, the Random Forest used 200 estimators with unlimited depth, allowing it to capture very granular decision boundaries, while GBT was limited to max_depth=6.
+
+### RNN (LSTM) Analysis
+
+The LSTM's performance (0.882 F1) demonstrates that neural approaches can be competitive on tabular poker data. The model trained on Apple Silicon GPU (MPS) and converged in 30 epochs with decreasing validation loss throughout. The LSTM's ability to process the 29 features sequentially allows it to build up a representation of the game state progressively — first absorbing draw information, then board texture, then pot math, and finally action history. This mirrors how a poker player might mentally evaluate a decision.
 
 ### Most Relevant Features
 
@@ -252,14 +303,15 @@ GBT achieves near-perfect AUC for raise (0.994). This shows that raise decisions
 
 1. **Noise:** Low-stakes play is inconsistent. That is, given the same decision point, two players may play the hand very differently, introducing lots of noise to the dataset. One possible way to address this would be to separate players by archetype (using KNN or pre-defined archetypes) and train separate models for each archetype.
 2. **Information Loss:** There are some features that were available to the players in-game that were not present in the dataset. In poker, one uses information about how the opponent has played in the past to determine how to play against them now. For example, if an opponent is known to be extremely tight preflop (only choosing to play the strongest hands), an astute player will make adjustments to their own play to adapt to this opponent's strategy. In the dataset, opponents were anonymous, thus losing this important feature.
+3. **Linear ceiling:** The near-identical performance of both LR variants (~66.7%) suggests a hard ceiling for linear models on this task. The ~22 percentage point gap between linear and nonlinear models underscores that poker decisions are fundamentally governed by feature interactions, not individual feature magnitudes.
 
 ---
 
 ## 6. Conclusion
 
-We built a pipeline from IRC poker hand histories to an ML-ready dataset with 444K+ decision points and 29 features. We trained Logistic Regression and Gradient Boosted Trees for fold/call/raise prediction. Gradient Boosted Trees achieve ~89% macro F1 vs ~67% for Logistic Regression, indicating that nonlinear models capture poker decision structure more effectively. Key drivers include pot/betting math, action history, and game state (position, street). The task remains challenging due to imperfect information, strategic diversity, and inherent label noise in low-stakes play.
+We built a pipeline from IRC poker hand histories to an ML-ready dataset with 444K+ decision points and 29 features. We trained five models for fold/call/raise prediction: Logistic Regression, Multinomial LR (L1), Gradient Boosted Trees, Random Forest, and an RNN (LSTM). Random Forest achieved the best performance at ~90.5% macro F1, followed by GBT (~88.6%) and LSTM (~88.2%), while both linear models plateau at ~66.7%. The large gap between linear and nonlinear models confirms that poker decision-making is governed by complex feature interactions. Key drivers include pot/betting math, action history, and game state (position, street). The task remains challenging due to imperfect information, strategic diversity, and inherent label noise in low-stakes play.
 
-**Next steps:** Add Random Forest and one more model (e.g., a simple neural net) to meet the 4-model requirement; add cross-validation for more robust evaluation; explore player-archetype segmentation to reduce label noise.
+**Future work:** Cross-validation for more robust evaluation; player-archetype segmentation (e.g., via clustering) to reduce label noise; hyperparameter tuning for the LSTM; exploring attention-based architectures that can learn which features matter most per decision point.
 
 ---
 
@@ -267,7 +319,8 @@ We built a pipeline from IRC poker hand histories to an ML-ready dataset with 44
 
 - IRC Poker Database: https://poker.cs.ualberta.ca/IRC/
 - PokerKit: https://github.com/uoftcprg/pokerkit
-- Scikit-learn documentation for LogisticRegression, GradientBoostingClassifier
+- Scikit-learn documentation for LogisticRegression, GradientBoostingClassifier, RandomForestClassifier
+- PyTorch documentation: https://pytorch.org/docs/stable/
 
 ---
 
@@ -275,5 +328,5 @@ We built a pipeline from IRC poker hand histories to an ML-ready dataset with 44
 
 | Member | Contribution |
 |--------|--------------|
-| Luca Miniati | Data preprocessing pipeline, feature extraction, Logistic Regression, Gradient Boosted Trees, evaluation, documentation |
-| Chigozirim Ike | *(per proposal: Multinomial Logistic Regression, Random Forest, RNN — to be completed)* |
+| Luca Miniati | Data preprocessing pipeline, feature extraction, Logistic Regression, Gradient Boosted Trees, evaluation, visualizations, documentation |
+| Chigozirim Ike | Multinomial Logistic Regression (L1/saga), Random Forest Classifier, RNN (LSTM) implementation and training, model comparison analysis, report updates |
