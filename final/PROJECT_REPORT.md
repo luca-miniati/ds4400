@@ -6,7 +6,7 @@
 
 **Link to code:** https://github.com/luca-miniati/ds4400/tree/main/final
 
-**Include link to video recording:** *(fill in)*  
+**Link to video recording:** https://drive.google.com/file/d/1xvKO22D24RBUekPyIw3YWDO8IG-cCnWd/view?usp=drive_link
 
 ---
 
